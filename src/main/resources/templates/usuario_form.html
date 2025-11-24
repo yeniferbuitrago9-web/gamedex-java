@@ -1,0 +1,58 @@
+<!-- templates/usuario_form.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Usuario</title>
+</head>
+<body>
+<h2 th:text="${usuario.idUsuario} == null ? 'Nuevo Usuario' : 'Editar Usuario'"></h2>
+
+<form th:action="@{${usuario.idUsuario} == null ? '/usuarios/guardar' : '/usuarios/guardar'}" 
+      th:object="${usuario}" method="post">
+
+<input type="hidden" th:field="*{idUsuario}" />
+
+    <div>
+        <label>Documento:</label>
+        <input type="text" th:field="*{docUsuario}" placeholder="Documento" required />
+    </div>
+
+    <div>
+        <label>Nombre:</label>
+        <input type="text" th:field="*{nombre}" placeholder="Nombre completo" required />
+    </div>
+
+    <div>
+        <label>Email:</label>
+        <input type="email" th:field="*{email}" placeholder="Correo electrónico" required />
+    </div>
+
+    <div>
+        <label>Teléfono:</label>
+        <input type="text" th:field="*{telefono}" placeholder="Teléfono" />
+    </div>
+
+    <div>
+        <label>Contraseña:</label>
+        <input type="password" th:field="*{password}" placeholder="Contraseña" 
+               th:attr="required=${usuario.idUsuario} == null ? 'required' : null"/>
+        <small th:if="${usuario.idUsuario != null}">Déjalo en blanco si no deseas cambiarla</small>
+    </div>
+
+    <div>
+        <label>Roles:</label>
+        <select th:field="*{roles}">
+  <option th:each="rol : ${roles}" th:value="${rol.idRol}" th:text="${rol.nombre}"></option>
+</select>
+        <small>Mantén presionada Ctrl (o Cmd) para seleccionar varios</small>
+    </div>
+
+    <div>
+        <button type="submit" th:text="${usuario.idUsuario} == null ? 'Crear Usuario' : 'Actualizar Usuario'"></button>
+        <a href="/usuarios/lista">Cancelar</a>
+    </div>
+
+</form>
+</body>
+</html>
