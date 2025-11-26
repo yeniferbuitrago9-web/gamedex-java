@@ -14,50 +14,51 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
+        private final CustomSuccessHandler customSuccessHandler;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // Inyectamos CustomSuccessHandler usando constructor
+        public SecurityConfig(CustomSuccessHandler customSuccessHandler) {
+                this.customSuccessHandler = customSuccessHandler;
+        }
 
-        http
-                .csrf(csrf -> csrf.disable())
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+                return authConfig.getAuthenticationManager();
+        }
 
-                .authorizeHttpRequests(auth -> auth
-                        // Permitir acceso público a login, css, js y error
-                        .requestMatchers("/login", "/css/**", "/js/**", "/error").permitAll()
-                        .requestMatchers("/access-denied").permitAll()
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(csrf -> csrf.disable())
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers("/login", "/", "/css/**", "/js/**", "/error")
+                                                .permitAll()
+                                                .requestMatchers("/access-denied").permitAll()
+                                                .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
+                                                .requestMatchers("/vendedor/**").hasRole("VENDEDOR")
+                                                .requestMatchers("/comprador/**").hasRole("COMPRADOR")
+                                                .requestMatchers("/usuarios/perfil/**").authenticated()
+                                                .anyRequest().authenticated())
+                                .formLogin(form -> form
+                                                .loginPage("/login")
+                                                .loginProcessingUrl("/login")
+                                                .successHandler(customSuccessHandler) // <--- CORRECTO
+                                                .failureUrl("/login?error=true")
+                                                .permitAll())
+                                .logout(logout -> logout
+                                                .logoutSuccessUrl("/login?logout")
+                                                .permitAll())
+                                .exceptionHandling(exception -> exception
+                                                .accessDeniedPage("/access-denied"))
+                                .sessionManagement(session -> session
+                                                .maximumSessions(1)
+                                                .expiredUrl("/login?expired"));
 
-                        // Rutas por rol
-                        .requestMatchers("/admin/**").hasRole("ADMINISTRADOR")
-                        .requestMatchers("/vendedor/**").hasRole("VENDEDOR")
-                        .requestMatchers("/comprador/**").hasRole("COMPRADOR")
-                        .requestMatchers("/usuario/**").hasRole("ADMINISTRADOR")
+                return http.build();
+        }
 
-                        // Cualquier otra ruta requiere autenticación
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login") // GET del formulario
-                        .loginProcessingUrl("/login") // POST de login
-                        .successHandler(new CustomSuccessHandler())
-                        .failureUrl("/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
-                        .permitAll())
-                .exceptionHandling(exception -> exception
-                        .accessDeniedPage("/access-denied"))
-                .sessionManagement(session -> session
-                        .maximumSessions(1)
-                        .expiredUrl("/login?expired"));
-
-        return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }

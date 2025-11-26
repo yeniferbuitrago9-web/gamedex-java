@@ -28,7 +28,7 @@ public class UsuarioController {
     public String nuevo(Model model) {
         model.addAttribute("usuario", new Usuario());
         model.addAttribute("roles", rolRepo.findAll()); // <--- aquí
-        return "usuario_form";
+        return "admin/usuario_form";
     }
 
     @PostMapping("/guardar")
@@ -43,7 +43,7 @@ public class UsuarioController {
                 model.addAttribute("usuario", usuario);
                 model.addAttribute("roles", rolRepo.findAll());
                 model.addAttribute("error", "El email ya está en uso");
-                return "usuario_form"; // <-- retornar formulario con mensaje
+                return "admin/usuario_form"; // <-- retornar formulario con mensaje
             }
         }
 
@@ -76,7 +76,7 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public String listar(Model model) {
         model.addAttribute("usuarios", repo.findAll());
-        return "usuarios";
+        return "admin/usuarios";
     }
 
     @GetMapping("/editar/{id}")
@@ -87,7 +87,7 @@ public class UsuarioController {
         u.setPassword("");
         model.addAttribute("usuario", u);
         model.addAttribute("roles", rolRepo.findAll()); // <--- aquí también
-        return "usuario_form";
+        return "admin/usuario_form";
     }
 
     @GetMapping("/eliminar/{id}")
@@ -105,7 +105,23 @@ public class UsuarioController {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         usuario.setPassword("");
         model.addAttribute("usuario", usuario);
-        return "usuario_form";
+
+        // Redirigir según rol
+        String rol = auth.getAuthorities().stream()
+                .map(a -> a.getAuthority())
+                .findFirst()
+                .orElse("");
+
+        switch (rol) {
+            case "ROLE_ADMINISTRADOR":
+                return "admin/usuario_form";
+            case "ROLE_VENDEDOR":
+                return "vendedor/perfil";
+            case "ROLE_COMPRADOR":
+                return "comprador/perfil";
+            default:
+                return "error";
+        }
     }
 
     @PostMapping("/perfil/guardar")

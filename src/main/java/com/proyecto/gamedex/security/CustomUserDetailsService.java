@@ -29,4 +29,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                         .map(rol -> new SimpleGrantedAuthority("ROLE_" + rol.getNombre())) // 👈 Agregado el prefijo
                         .collect(Collectors.toList()));
     }
+
+    
+
 }
+
+
