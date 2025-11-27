@@ -25,7 +25,15 @@
         <button type="submit" class="btn btn-primary w-100">Entrar</button>
     </form>
 
+    <p class="mt-3 text-center">
+    ¿No tienes cuenta? 
+    <a href="/registro" class="btn btn-outline-primary btn-sm">Regístrate</a>
+</p>
+
     <!-- Mensajes -->
+     <div th:if="${param.success}" class="alert alert-success mt-3 text-center">
+    Usuario registrado correctamente. ¡Ahora puedes iniciar sesión!
+</div>
     <div th:if="${param.error}" class="alert alert-danger mt-3">
         Credenciales incorrectas. Intenta nuevamente.
     </div>

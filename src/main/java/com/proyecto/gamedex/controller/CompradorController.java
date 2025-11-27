@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.RequiredArgsConstructor;
@@ -21,13 +22,20 @@ public class CompradorController {
     private final ProductoService productoService; // inyectamos el servicio
     private final UsuarioRepository usuarioRepo; // inyectamos el repositorio
 
+    @GetMapping("/home/{idUsuario}")
+    public String home(@PathVariable("idUsuario") Integer idUsuario, Model model) {
+        Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
+        model.addAttribute("usuario", usuario);
+        return "comprador/home";
+    }
+
     @GetMapping("/home")
     public String home(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName(); // email del usuario logueado
+        String email = auth.getName();
         Usuario usuario = usuarioRepo.findByEmail(email).orElse(null);
         model.addAttribute("usuario", usuario);
-        return "comprador/home";
+        return "comprador/home"; // debe existir home.html
     }
 
     @GetMapping("/productos")
