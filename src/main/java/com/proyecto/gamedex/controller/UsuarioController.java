@@ -4,6 +4,7 @@ import java.util.Optional;
 import com.proyecto.gamedex.model.Usuario;
 import com.proyecto.gamedex.repository.RolRepository;
 import com.proyecto.gamedex.repository.UsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -22,42 +23,45 @@ public class UsuarioController {
     @Autowired
     private RolRepository rolRepo;
 
-    // ----- CRUD USUARIOS -----
+    // ------------------- CREAR USUARIO -------------------
     @GetMapping("/nuevo")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public String nuevo(Model model) {
         model.addAttribute("usuario", new Usuario());
-        model.addAttribute("roles", rolRepo.findAll()); // <--- aquí
+        model.addAttribute("roles", rolRepo.findAll());
         return "admin/usuario_form";
     }
 
+    // ------------------- GUARDAR USUARIO -------------------
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Usuario usuario, Model model) {
         boolean esEdicion = usuario.getIdUsuario() != null;
 
-        // Verificar email duplicado solo si pertenece a otro usuario
+        // Validar email duplicado
         Optional<Usuario> existente = repo.findByEmail(usuario.getEmail());
         if (existente.isPresent()) {
             Usuario u = existente.get();
             if (!esEdicion || !u.getIdUsuario().equals(usuario.getIdUsuario())) {
+
                 model.addAttribute("usuario", usuario);
                 model.addAttribute("roles", rolRepo.findAll());
                 model.addAttribute("error", "El email ya está en uso");
-                return "admin/usuario_form"; // <-- retornar formulario con mensaje
+
+                return "admin/usuario_form";
             }
         }
 
         if (esEdicion) {
-            // Actualizar usuario existente
+            // Editar usuario existente
             Usuario u = repo.findById(usuario.getIdUsuario())
                     .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
             u.setNombre(usuario.getNombre());
             u.setEmail(usuario.getEmail());
             u.setDocUsuario(usuario.getDocUsuario());
             u.setTelefono(usuario.getTelefono());
             u.setRoles(usuario.getRoles());
 
-            // Solo actualizar password si se ingresó
             if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
                 u.setPassword(new BCryptPasswordEncoder().encode(usuario.getPassword()));
             }
@@ -72,6 +76,7 @@ public class UsuarioController {
         return "redirect:/usuarios/lista";
     }
 
+    // ------------------- LISTAR -------------------
     @GetMapping("/lista")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public String listar(Model model) {
@@ -79,17 +84,22 @@ public class UsuarioController {
         return "admin/usuarios";
     }
 
+    // ------------------- EDITAR -------------------
     @GetMapping("/editar/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public String editar(@PathVariable Integer id, Model model) {
         Usuario u = repo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-        u.setPassword("");
+
+        u.setPassword(""); // importante: para no mostrar el hash
+
         model.addAttribute("usuario", u);
-        model.addAttribute("roles", rolRepo.findAll()); // <--- aquí también
+        model.addAttribute("roles", rolRepo.findAll());
+
         return "admin/usuario_form";
     }
 
+    // ------------------- ELIMINAR -------------------
     @GetMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public String eliminar(@PathVariable Integer id) {
@@ -97,17 +107,19 @@ public class UsuarioController {
         return "redirect:/usuarios/lista";
     }
 
-    // ----- PERFIL DEL USUARIO -----
+    // ------------------- PERFIL DEL USUARIO LOGEADO -------------------
     @GetMapping("/perfil")
     public String perfil(Model model, Authentication auth) {
         String email = auth.getName();
         Usuario usuario = repo.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
         usuario.setPassword("");
+
         model.addAttribute("usuario", usuario);
 
-        // Redirigir según rol
-        String rol = auth.getAuthorities().stream()
+        String rol = auth.getAuthorities()
+                .stream()
                 .map(a -> a.getAuthority())
                 .findFirst()
                 .orElse("");
@@ -124,26 +136,27 @@ public class UsuarioController {
         }
     }
 
+    // ------------------- GUARDAR PERFIL -------------------
     @PostMapping("/perfil/guardar")
     public String guardarPerfil(@ModelAttribute Usuario usuario, Authentication auth) {
+
         String email = auth.getName();
         Usuario actual = repo.findByEmail(email).orElseThrow();
+
         actual.setNombre(usuario.getNombre());
         actual.setTelefono(usuario.getTelefono());
+
         if (usuario.getPassword() != null && !usuario.getPassword().isBlank()) {
             actual.setPassword(new BCryptPasswordEncoder().encode(usuario.getPassword()));
         }
+
         repo.save(actual);
 
-        // Redirigir según rol
-        String rol = auth.getAuthorities().stream()
+        String rol = auth.getAuthorities()
+                .stream()
                 .map(a -> a.getAuthority())
-                .filter(r -> r.equals("ROLE_ADMINISTRADOR") || r.equals("ROLE_VENDEDOR") || r.equals("ROLE_COMPRADOR"))
                 .findFirst()
-                .orElse(null);
-
-        if (rol == null)
-            return "redirect:/auth/login?error";
+                .orElse("");
 
         switch (rol) {
             case "ROLE_ADMINISTRADOR":
