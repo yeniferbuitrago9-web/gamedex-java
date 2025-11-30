@@ -46,9 +46,12 @@
                 <i class="bi bi-box-seam"></i> Productos
             </a>
 
-            <a href="/admin/reportes" class="btn w-100 text-start text-light mb-2">
-                <i class="bi bi-clipboard-data"></i> Reportes
-            </a>
+            <a th:href="@{/comunidades/home}" class="btn w-100 text-start text-light mb-2">
+    <i class="bi bi-people"></i> Comunidades
+</a>
+
+
+           
 
             <a href="/logout" class="btn w-100 text-start text-danger mt-4">
                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
@@ -82,13 +85,7 @@
                 </div>
 
                 <!-- Reportes -->
-                <div class="col-md-4">
-                    <div class="card card-custom p-3 shadow">
-                        <h5><i class="bi bi-clipboard-data"></i> Reportes</h5>
-                        <p>Visualiza métricas, ventas y actividad general.</p>
-                        <a href="/admin/reportes" class="btn btn-primary">Entrar</a>
-                    </div>
-                </div>
+                
 
             </div>
 

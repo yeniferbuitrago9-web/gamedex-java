@@ -18,7 +18,7 @@ public class CarritoService {
     // Crear un carrito o devolver el existente
     public Carrito crearCarrito(Integer idUsuario) {
 
-        Usuario usuario = usuarioRepository.findById(idUsuario)
+        Usuario usuario = usuarioRepository.findById(dUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no existe"));
 
         return carritoRepository.findByUsuario_IdUsuario(idUsuario)
@@ -36,7 +36,7 @@ public class CarritoService {
         Carrito carrito = carritoRepository.findById(idCarrito)
                 .orElseThrow(() -> new RuntimeException("Carrito no existe"));
 
-        Producto producto = productoRepository.findById(idProducto)
+        Producto producto = productoRepository.findById(id_Producto)
                 .orElseThrow(() -> new RuntimeException("Producto no existe"));
 
         CarritoItem item = new CarritoItem();
