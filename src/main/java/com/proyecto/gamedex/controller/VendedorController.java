@@ -10,11 +10,6 @@ public class VendedorController {
 
     @GetMapping("/home")
     public String homeVendedor() {
-        return "vendedor/home";  // Vista: templates/vendedor/home.html
-    }
-
-    @GetMapping("/productos")
-    public String productosVendedor() {
-        return "vendedor/productos";  // Vista: templates/vendedor/productos.html
+        return "vendedor/home"; 
     }
 }

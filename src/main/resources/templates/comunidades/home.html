@@ -25,29 +25,12 @@
             background-color: #1f1f1f;
             border: 1px solid #2a2a2a;
             color: white;
+            border-radius: 10px;
         }
 
-        /* Fondo Zelda */
+        /* Fondos */
         .card-bg-zelda {
-            background-image: url('/img/zelda.webp');  
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            border-radius: 10px;
-            position: relative;
-        }
-        /* Fondo Hollow Knigth */ 
-        .card-bg-hollow {
-            background-image: url('/img/hollow.png');  
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            border-radius: 10px;
-            position: relative;
-        }
-        /* Fondo Pokemon */
-         .card-bg-pokemon {
-            background-image: url('/img/pokemon.jpg');  
+            background-image: url('/img/zelda.webp');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -55,21 +38,27 @@
             position: relative;
         }
 
-        /* Oscurecer fondo para mejor lectura */
-        .card-bg-zelda::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
+        .card-bg-hollow {
+            background-image: url('/img/hollow.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             border-radius: 10px;
+            position: relative;
         }
-        .card-bg-hollow::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
+
+        .card-bg-pokemon {
+            background-image: url('/img/pokemon.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             border-radius: 10px;
+            position: relative;
         }
+
+        /* Overlay oscuro */
+        .card-bg-zelda::before,
+        .card-bg-hollow::before,
         .card-bg-pokemon::before {
             content: "";
             position: absolute;
@@ -78,20 +67,13 @@
             border-radius: 10px;
         }
 
-        /* Para que el texto esté arriba del overlay */
-        .card-bg-zelda * {
+        /* Texto encima del overlay */
+        .card-bg-zelda *,
+        .card-bg-hollow *,
+        .card-bg-pokemon * {
             position: relative;
             z-index: 1;
         }
-        .card-bg-hollow * {
-            position: relative;
-            z-index: 1;
-        }
-        .card-bg-pokeon * {
-            position: relative;
-            z-index: 1;
-        }
-
     </style>
 </head>
 
@@ -102,10 +84,10 @@
 
         <!-- Sidebar -->
         <div class="col-2 sidebar p-3">
-            <h4 class="text-center mb-4">🎮 GameDex Vendedor</h4>
-
-            <a th:href="@{/vendedor/productos}" class="btn w-100 text-start text-light mb-2">
-                <i class="bi bi-box-seam"></i> Productos
+            <h4 class="text-center mb-4">🎮 GameDex Comunidades</h4>
+            
+            <a th:href="@{/vendedor/home}" class="btn w-100 text-start text-light mb-2">
+                <i class="bi bi-box-seam"></i> INICIO
             </a>
 
             <a href="/logout" class="btn w-100 text-start text-danger mt-4">
@@ -117,7 +99,7 @@
         <div class="col-10 p-4">
 
             <h2 class="mb-4">¡Bienvenido a Nuestras Comunidades!</h2>
-            <p>Bienvenido Querido, Aquí encontrarás todas nuestras comunidades </p>
+            <p>Bienvenido querido, aquí encontrarás todas nuestras comunidades.</p>
 
             <div class="row mt-4">
 
@@ -129,17 +111,21 @@
                         <a th:href="@{/comunidades/zelda}" class="btn btn-primary">Entrar</a>
                     </div>
                 </div>
+
+                <!-- TARJETA HOLLOW KNIGHT -->
                 <div class="col-md-4">
                     <div class="card card-custom p-3 shadow card-bg-hollow">
-                        <h5><i class="bi bi-box-seam"></i> Hollow Knigth</h5>
-                        <p>Comunidad para hablar sobre el videojuego hollow Knigth</p>
+                        <h5><i class="bi bi-box-seam"></i> Hollow Knight</h5>
+                        <p>Comunidad para hablar sobre el videojuego Hollow Knight</p>
                         <a th:href="@{/comunidades/hollow}" class="btn btn-primary">Entrar</a>
                     </div>
                 </div>
+
+                <!-- TARJETA POKEMON -->
                 <div class="col-md-4">
                     <div class="card card-custom p-3 shadow card-bg-pokemon">
-                        <h5><i class="bi bi-box-seam"></i> Pokemon </h5>
-                        <p>Comunidad para hablar sobre los videojuegos de Pokemon</p>
+                        <h5><i class="bi bi-box-seam"></i> Pokémon</h5>
+                        <p>Comunidad para hablar sobre los videojuegos de Pokémon</p>
                         <a th:href="@{/comunidades/pokemon}" class="btn btn-primary">Entrar</a>
                     </div>
                 </div>
