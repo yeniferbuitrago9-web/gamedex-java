@@ -31,7 +31,7 @@ public class VendedorController {
         return "vendedor/home"; 
     }
 
-    // 🔥 NUEVO: productos con filtros y rol
+    // 🔥 productos con filtros y rol
     @GetMapping("/productos")
     public String productos(
             @RequestParam(required = false) String nombre,
@@ -51,7 +51,7 @@ public class VendedorController {
 
         model.addAttribute("usuario", usuario);
         model.addAttribute("mostrarBuscador", true);
-        model.addAttribute("rol", "vendedor"); // necesario para el fragmento
+        model.addAttribute("rol", "vendedor");
         model.addAttribute("nombreBusqueda", nombre);
         model.addAttribute("precioMinBusqueda", precioMin);
         model.addAttribute("precioMaxBusqueda", precioMax);
