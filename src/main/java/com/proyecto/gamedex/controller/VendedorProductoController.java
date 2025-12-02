@@ -15,9 +15,8 @@ import com.proyecto.gamedex.service.ProductoService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/vendedor/productos")
+@RequestMapping("/vendedor/productos/gestion")
 @RequiredArgsConstructor
-
 public class VendedorProductoController {
 
     private final ProductoService productoService;
@@ -26,13 +25,15 @@ public class VendedorProductoController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("productos", productoService.listar());
-        return "vendedor/productos"; // vista dentro de templates/vendedor/
+        model.addAttribute("mostrarBuscador", true); // activar búsqueda global
+        return "vendedor/productos";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("producto", new Producto());
-        model.addAttribute("categorias", categoriaService.listar()); // <--
+        model.addAttribute("categorias", categoriaService.listar());
+        model.addAttribute("mostrarBuscador", true); // activar búsqueda
         return "vendedor/productos_form";
     }
 
@@ -47,6 +48,7 @@ public class VendedorProductoController {
         Producto producto = productoService.buscarPorId(id);
         model.addAttribute("producto", producto);
         model.addAttribute("categorias", categoriaService.listar());
+        model.addAttribute("mostrarBuscador", true);
         return "vendedor/productos_form";
     }
 

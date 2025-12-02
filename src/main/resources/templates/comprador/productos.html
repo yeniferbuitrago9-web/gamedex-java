@@ -9,10 +9,10 @@
 
     <style>
         body {
-            background-color: #f5f6fa; /* Fondo suave */
+            background-color: #f5f6fa;
         }
         .table thead {
-            background-color: #dfe6e9; /* Encabezado gris claro */
+            background-color: #dfe6e9;
         }
         .btn-primary {
             background-color: #0984e3;
@@ -33,10 +33,12 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">📦 Productos Disponibles</h2>
-
-        <!-- Botón para volver al dashboard del administrador -->
         <a href="/comprador/home" class="btn btn-back">🏠 Volver al Panel</a>
     </div>
+
+    <!-- 🔍 Búsqueda Multicriterio -->
+    <div th:if="${mostrarBuscador}"
+         th:replace="fragments/busqueda_productos :: busquedaProductos"></div>
 
     <table class="table table-bordered table-striped shadow-sm">
         <thead>
@@ -63,7 +65,7 @@
                     <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}" />
                     <input type="hidden" name="idProducto" th:value="${producto.idProducto}" />
 
-                    <input class="form-control form-control-sm" 
+                    <input class="form-control form-control-sm"
                            type="number" name="cantidad" value="1" min="1" max="10"
                            style="width: 70px;" />
 
@@ -76,8 +78,7 @@
         </tbody>
     </table>
 
-    <!-- Botón para ver el carrito -->
-    <a class="btn btn-primary mt-3" 
+    <a class="btn btn-primary mt-3"
        th:href="@{/carrito/usuario/{idUsuario}(idUsuario=${usuario.idUsuario})}">
         🛒 Ver Carrito
     </a>

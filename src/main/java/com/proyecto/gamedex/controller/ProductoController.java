@@ -14,23 +14,39 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/producto")
+@RequestMapping("/producto")  // <--- OJO: nada de /admin aquí
 @RequiredArgsConstructor
 public class ProductoController {
 
     private final ProductoService productoService;
-    private final UsuarioService UsuarioService; // <--- agregar esto
+    private final UsuarioService UsuarioService;
     private final CarritoService CarritoService;
 
-    // Lista todos los productos en la vista "productos.html"
+    // Página pública de productos
     @GetMapping
-    public String verProductos(Model model) {
-        List<Producto> productos = productoService.listar();
+    public String verProductos(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Double precioMin,
+            @RequestParam(required = false) Double precioMax,
+            Model model
+    ) {
+
+        // Filtro seguro
+        List<Producto> productos;
+
+        if (nombre != null || precioMin != null || precioMax != null) {
+            productos = productoService.buscarPorFiltros(nombre, precioMin, precioMax);
+        } else {
+            productos = productoService.listar();
+        }
+
         model.addAttribute("productos", productos);
 
-        Integer idUsuario = 1; // temporal
+        // Datos del usuario (temporal)
+        Integer idUsuario = 1;
         model.addAttribute("usuario", UsuarioService.obtenerUsuario(idUsuario));
 
+        // Carrito
         Carrito carrito = CarritoService.obtenerPorUsuario(idUsuario);
         if (carrito == null) {
             carrito = CarritoService.crearCarrito(idUsuario);
@@ -40,38 +56,37 @@ public class ProductoController {
         return "productos";
     }
 
-    // Formulario para crear un producto
+    // Crear producto (solo si deseas modo público)
     @GetMapping("/nuevo")
     public String nuevoProducto(Model model) {
         model.addAttribute("producto", new Producto());
-        return "producto-form"; // HTML con formulario
+        return "producto-form";
     }
 
-    // Guardar producto (POST)
     @PostMapping("/guardar")
     public String guardarProducto(@ModelAttribute("producto") Producto producto) {
         productoService.crear(producto);
-        return "redirect:/producto"; // redirige a la lista de productos
+        return "redirect:/producto";
     }
 
-    // Formulario para editar un producto
     @GetMapping("/editar/{id}")
     public String editarProducto(@PathVariable Integer id, Model model) {
         Producto producto = productoService.buscarPorId(id);
         model.addAttribute("producto", producto);
-        return "producto-form"; // mismo HTML de formulario
+        return "producto-form";
     }
 
-    // Guardar cambios de edición
     @PostMapping("/actualizar/{id}")
     public String actualizarProducto(@PathVariable Integer id, @ModelAttribute("producto") Producto producto) {
         productoService.actualizar(id, producto);
         return "redirect:/producto";
     }
 
-    // Eliminar producto
-    @GetMapping("/eliminar/{id}")
-    public String eliminarProducto(@PathVariable Integer id) {
+    // IMPORTANTE:
+    // YA NO USAMOS /admin/productos/eliminar EN ESTE CONTROLADOR
+    // para evitar conflicto con el AdminController
+    @GetMapping("/eliminar-publico/{id}")
+    public String eliminarProductoPublico(@PathVariable Integer id) {
         productoService.eliminar(id);
         return "redirect:/producto";
     }

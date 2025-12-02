@@ -43,4 +43,9 @@ public class ProductoService {
     public void eliminar(Integer id) {
         productoRepository.deleteById(id);
     }
+
+    // 🔥 AGREGADO: método para filtrar productos
+    public List<Producto> buscarPorFiltros(String nombre, Double min, Double max) {
+        return productoRepository.buscarPorFiltros(nombre, min, max);
+    }
 }

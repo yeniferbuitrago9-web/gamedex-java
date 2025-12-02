@@ -5,22 +5,17 @@
     <title>Gamedex</title>
     <link rel="stylesheet" 
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    
     <style>
-        .hero {
-            background: linear-gradient(135deg, #1a1a1a, #333);
-            color: white;
-            padding: 120px 20px;
-            text-align: center;
+        /* OSCURECER la imagen del fondo */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
         }
-        .btn-main {
-            background-color: #6f42c1;
-            color: white;
-            padding: 12px 30px;
-            font-size: 18px;
-            border-radius: 8px;
-        }
-        .section {
-            padding: 70px 20px;
+        .hero-content {
+            position: relative;
+            z-index: 2;
         }
     </style>
 </head>
@@ -28,14 +23,27 @@
 <body>
 
 <!-- HERO -->
-<section class="hero">
-    <h1 class="display-3 fw-bold">GAMEDEx</h1>
-    <p class="lead mt-3">Tu plataforma para comprar, vender e intercambiar artículos gamers.</p>
-    <a href="/login" class="btn btn-main mt-3">Iniciar Sesión</a>
+<section class="position-relative text-center text-white" 
+         style="background-image: url('/img/fondo-8bits.jpg'); 
+                background-size: cover; 
+                background-position: center; 
+                padding: 150px 20px;">
+    
+    <!-- CAPA OSCURA -->
+    <div class="hero-overlay"></div>
+
+    <!-- CONTENIDO -->
+    <div class="hero-content">
+        <h1 class="display-3 fw-bold">GameDex</h1>
+        <p class="lead mt-3">Tu plataforma para comprar, vender e intercambiar artículos gamers.</p>
+        <a href="/login" class="btn btn-main mt-3 btn-lg" 
+           style="background-color:#6f42c1; color:white;">Iniciar Sesión</a>
+    </div>
+
 </section>
 
 <!-- SECCIÓN INFO -->
-<section class="section text-center">
+<section class="section text-center py-5">
     <div class="container">
         <h2 class="mb-4">¿Qué puedes hacer aquí?</h2>
         <div class="row mt-4">
@@ -61,7 +69,13 @@
 
 <!-- FOOTER -->
 <footer class="text-center p-4 bg-light">
-    <p>© 2025 Gamedex. Proyecto académico — Análisis y Desarrollo de Software.</p>
+
+    <!-- LOGO -->
+    <img src="/img/logo-gamedex.jpg" 
+         class="mb-3" 
+         style="width: 70px; opacity: 0.9;">
+
+    <p class="mb-0">© 2025 Gamedex. Proyecto académico — Análisis y Desarrollo de Software.</p>
 </footer>
 
 </body>

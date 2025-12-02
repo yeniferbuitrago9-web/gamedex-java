@@ -12,7 +12,7 @@
 
 <div class="container py-4">
 
-    <a href="/admin/home" class="btn btn-outline-primary mb-3">
+    <a href="/vendedor/home" class="btn btn-outline-primary mb-3">
     🏠 Volver al Panel
 </a>
 
@@ -24,7 +24,7 @@
     <div class="card shadow-sm">
         <div class="card-body">
 
-            <form th:action="@{/admin/productos/guardar}" 
+            <form th:action="@{/vendedor/productos/guardar}" 
                   th:object="${producto}" method="post">
 
                 <!-- Campo oculto para el ID -->
