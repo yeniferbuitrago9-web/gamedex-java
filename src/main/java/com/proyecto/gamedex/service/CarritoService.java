@@ -69,19 +69,22 @@ public class CarritoService {
         return carritoRepository.findByUsuario_IdUsuario(idUsuario)
                 .orElse(null);
     }
+
+    // Agregar item usando idUsuario (auto crea carrito)
     public void agregarItemPorUsuario(Integer idUsuario, Integer idProducto, Integer cantidad) {
-    Carrito carrito = crearCarrito(idUsuario); // obtiene o crea
-    Producto producto = productoRepository.findById(idProducto)
-            .orElseThrow(() -> new RuntimeException("Producto no existe"));
+        Carrito carrito = crearCarrito(idUsuario);
 
-    CarritoItem item = new CarritoItem();
-    item.setCarrito(carrito);
-    item.setProducto(producto);
-    item.setCantidad(cantidad);
-    itemRepository.save(item);
+        Producto producto = productoRepository.findById(idProducto)
+                .orElseThrow(() -> new RuntimeException("Producto no existe"));
 
-    carrito.setCantidad(carrito.getCantidad() + cantidad);
-    carritoRepository.save(carrito);
-}
+        CarritoItem item = new CarritoItem();
+        item.setCarrito(carrito);
+        item.setProducto(producto);
+        item.setCantidad(cantidad);
 
+        itemRepository.save(item);
+
+        carrito.setCantidad(carrito.getCantidad() + cantidad);
+        carritoRepository.save(carrito);
+    }
 }

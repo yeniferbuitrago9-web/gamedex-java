@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Home Comprador</title>
@@ -49,11 +49,12 @@
                 <a class="nav-link" th:href="@{/carrito/usuario/{idUsuario}(idUsuario=${usuario.idUsuario})}">Carrito</a>
             </li>
             <li class="nav-item"><a class="nav-link" href="/usuarios/perfil">Mi Perfil</a></li>
+
             <li class="nav-item">
-    <a class="nav-link" href="/comunidades/home">
-        <i class="bi bi-people"></i> Comunidades
-    </a>
-</li>
+                <a class="nav-link" href="/comunidades/home">
+                    <i class="bi bi-people"></i> Comunidades
+                </a>
+            </li>
 
             <li class="nav-item">
                 <a class="nav-link text-danger fw-bold" href="/logout">
@@ -63,6 +64,11 @@
         </ul>
     </div>
 </nav>
+
+<!-- 🔍 Buscador (si está activado) -->
+<div class="container mt-4" th:if="${mostrarBuscador}">
+    <div th:replace="fragments/busqueda_productos :: busquedaProductos"></div>
+</div>
 
 <!-- CONTENIDO -->
 <div class="container mt-5">
@@ -83,7 +89,6 @@
                 <h5 class="fw-bold">Carrito</h5>
                 <p>Revisa los productos que has agregado.</p>
                 <a th:href="@{/carrito/usuario/{idUsuario}(idUsuario=${usuario.idUsuario})}" class="btn btn-main">Ir al Carrito</a>
-
             </div>
         </div>
 
