@@ -41,35 +41,40 @@
             <input type="hidden" th:field="*{idUsuario}">
 
             <!-- Documento -->
-            <div class="mb-3">
-                <label class="form-label">Documento</label>
-                <input type="text" th:field="*{docUsuario}" class="form-control" required>
-            </div>
+            <!-- Documento -->
+<div class="mb-3">
+    <label class="form-label">Documento</label>
+    <input type="text" th:field="*{docUsuario}" class="form-control"
+           pattern="\d+" maxlength="10" title="Solo números" required>
+</div>
 
-            <!-- Nombre -->
-            <div class="mb-3">
-                <label class="form-label">Nombre</label>
-                <input type="text" th:field="*{nombre}" class="form-control" required>
-            </div>
+<!-- Nombre -->
+<div class="mb-3">
+    <label class="form-label">Nombre</label>
+    <input type="text" th:field="*{nombre}" class="form-control"
+           pattern="[A-Za-zÀ-ÿ\s]+" title="Solo letras y espacios" required>
+</div>
 
-            <!-- Email -->
-            <div class="mb-3">
-                <label class="form-label">Correo Electrónico</label>
-                <input type="email" th:field="*{email}" class="form-control" required>
-            </div>
+<!-- Email -->
+<div class="mb-3">
+    <label class="form-label">Correo Electrónico</label>
+    <input type="email" th:field="*{email}" class="form-control" required>
+</div>
 
-            <!-- Teléfono -->
-            <div class="mb-3">
-                <label class="form-label">Teléfono</label>
-                <input type="text" th:field="*{telefono}" class="form-control">
-            </div>
+<!-- Teléfono -->
+<div class="mb-3">
+    <label class="form-label">Teléfono</label>
+    <input type="text" th:field="*{telefono}" class="form-control"
+           pattern="\d+" maxlength="10" title="Solo números">
+</div>
 
-            <!-- PASSWORD -->
-            <div class="mb-3">
-                <label class="form-label">Contraseña</label>
-                <input type="password" th:field="*{password}" class="form-control"
-                       th:placeholder="${usuario.idUsuario == null} ? 'Ingrese una contraseña' : 'Dejar vacío para no cambiar'">
-            </div>
+<!-- PASSWORD -->
+<div class="mb-3">
+    <label class="form-label">Contraseña</label>
+    <input type="password" th:field="*{password}" class="form-control"
+           th:placeholder="${usuario.idUsuario == null} ? 'Ingrese una contraseña' : 'Dejar vacío para no cambiar'"
+           minlength="6">
+</div>
 
             <!-- ROLES -->
            <div class="mb-3">
