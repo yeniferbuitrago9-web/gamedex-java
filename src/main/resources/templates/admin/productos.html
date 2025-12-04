@@ -12,6 +12,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
+        /* Evita que los botones de acciones se rompan en varias líneas */
+        .acciones-col {
+            white-space: nowrap;
+        }
         /* Adaptado del estilo de Gestión de Usuarios */
         body {
             background: #f4f6fa; /* Fondo más claro */
@@ -131,22 +135,11 @@
                     <!-- DESCRIPCIÓN: Ahora está centrado -->
                     <th class="descripcion-celda text-center">Descripción</th>
                     
-                    <!-- PRECIO: Se centra el título, pero el contenido se mantiene a la derecha por la clase precio-celda -->
                     <th class="precio-celda text-center">Precio</th>
-                    
-                    <!-- CATEGORÍA: Ahora está centrado -->
                     <th class="text-center">Categoría</th> 
-                    
-                    <!-- CANT.: Usa la clase corta y ahora está centrado -->
                     <th class="columna-corta text-center">Cant.</th>
-                    
-                    <!-- GARANTÍA: Usa la clase corta y ahora está centrado -->
                     <th class="columna-corta text-center">Garantía (Días)</th>
-                    
-                    <!-- ALTA: Usa la clase ancha y ya estaba centrado -->
-                    <th class="columna-ancha text-center">Alta</th>
-                    
-                    <!-- ACCIONES: Ya estaba centrado -->
+                    <th class="columna-ancha text-center">Creado</th>
                     <th class="text-center" style="width: 150px;">Acciones</th>
                 </tr>
                 </thead>
@@ -154,32 +147,27 @@
                 <tbody>
                 <tr th:each="p : ${productos}">
                     <td class="columna-ancha" th:text="${p.nombre}"></td>
-                    
-                    <!-- Descripción: Tooltip para ver texto completo -->
-                    <td class="descripcion-celda" 
+
+                    <td class="descripcion-celda"
                         th:text="${p.descripcion}"
                         data-bs-toggle="tooltip" 
                         data-bs-placement="top"
                         th:title="${p.descripcion}">
                     </td>
-                    
-                    <!-- Precio: Alineado a la derecha por la clase precio-celda -->
+
                     <td class="precio-celda">
-                        $ <span th:text="${#numbers.formatDecimal(p.precio, 1, 'POINT', 2, 'COMMA')}"></span>
+                        $ <span th:text="${#numbers.formatDecimal(p.precio, 1, 'POINT', 0, 'COMMA')}"></span>
                     </td>
-                    
-                    <!-- Categoría: Ancho automático -->
+
                     <td th:text="${p.categoria.nombre}"></td>
-                    
-                    <!-- Columnas numéricas: Centradas y compactas -->
+
                     <td class="columna-corta" th:text="${p.cantidad}"></td>
                     <td class="columna-corta" th:text="${p.diasGarantia}"></td>
-                    
-                    <!-- Fecha: Usa la clase ancha y formato legible -->
+
                     <td class="columna-ancha text-center" th:text="${#temporals.format(p.createdAt, 'dd-MM-yyyy')}"></td>
 
-                    <!-- Acciones: Botones pequeños (btn-sm) -->
-                    <td class="text-center">
+                    <!-- ✅ AQUÍ AGREGO LA CLASE PARA QUE LAS ACCIONES NO SE ROMPAN -->
+                    <td class="text-center acciones-col">
                         <a th:href="@{'/admin/productos/editar/' + ${p.idProducto}}"
                            class="btn btn-warning btn-sm">Editar</a>
 

@@ -22,8 +22,32 @@
         .btn-warning {
             color: #000;
         }
+        .btn-accion {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .btn-edit {
+            background: #ffc107;
+            color: #000;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+        .btn-delete:hover {
+            background: #bb2d3b;
+        }
         .card {
             border-radius: 12px;
+        }
+
+        /* 🚀 PARA QUE LAS ACCIONES NO SE BAJEN DE LÍNEA */
+        .acciones-col {
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -36,8 +60,6 @@
         <h2 class="fw-bold">Gestión de Productos</h2>
         <a class="btn btn-primary" th:href="@{/vendedor/productos/nuevo}">+ Nuevo Producto</a>
     </div>
-
-    
 
     <!-- TABLA -->
     <div class="card shadow-sm p-3">
@@ -58,18 +80,26 @@
                 <tr th:each="p : ${productos}">
                     <td th:text="${p.nombre}"></td>
                     <td th:text="${p.descripcion}"></td>
-                    <td>$ <span th:text="${p.precio}"></span></td>
+
+                    <!-- PRECIO SIN DECIMALES -->
+                    <td>
+                        $ <span th:text="${#numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}"></span>
+                    </td>
+
                     <td th:text="${p.categoria.nombre}"></td>
                     <td th:text="${p.cantidad}"></td>
 
-                    <td class="text-center">
+                    <!-- ✔ ACCIONES EN UNA SOLA LÍNEA -->
+                    <td class="text-center acciones-col">
                         <a th:href="@{'/vendedor/productos/editar/' + ${p.idProducto}}"
-                           class="btn btn-warning btn-sm">Editar</a>
+                           class="btn btn-accion btn-edit">
+                            ✏️ Editar
+                        </a>
 
                         <a th:href="@{'/vendedor/productos/eliminar/' + ${p.idProducto}}"
-                           class="btn btn-danger btn-sm"
+                           class="btn btn-accion btn-delete"
                            onclick="return confirm('¿Eliminar este producto?');">
-                            Eliminar
+                            🗑️ Eliminar
                         </a>
                     </td>
                 </tr>
