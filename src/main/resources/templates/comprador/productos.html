@@ -9,10 +9,10 @@
 
     <style>
         body {
-            background-color: #f5f6fa; /* Fondo suave */
+            background-color: #f5f6fa;
         }
         .table thead {
-            background-color: #dfe6e9; /* Encabezado gris claro */
+            background-color: #dfe6e9;
         }
         .btn-primary {
             background-color: #0984e3;
@@ -24,6 +24,15 @@
             background-color: #6c5ce7;
             color: white;
         }
+        /* Estilos de centrado para celdas de números/precios */
+        .text-numeric {
+            text-align: center;
+            width: 80px; /* Hace las celdas de cantidad más compactas */
+        }
+        .text-price {
+            text-align: center;
+            width: 120px;
+        }
     </style>
 </head>
 
@@ -33,20 +42,25 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">📦 Productos Disponibles</h2>
-
-        <!-- Botón para volver al dashboard del administrador -->
         <a href="/comprador/home" class="btn btn-back">🏠 Volver al Panel</a>
     </div>
 
-    <table class="table table-bordered table-striped shadow-sm">
+    <!-- 🔍 Búsqueda Multicriterio -->
+    <div th:if="${mostrarBuscador}"
+         th:replace="fragments/busqueda_productos :: busquedaProductos"></div>
+
+    <table class="table table-bordered table-striped shadow-sm align-middle">
         <thead>
         <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Precio</th>
-            <th>Categoría</th>
-            <th>Cantidad</th>
-            <th>Acciones</th>
+            <!-- Títulos centrados con text-center -->
+            <th class="text-center">Nombre</th>
+            <th class="text-center">Descripción</th>
+            <th class="text-center">Precio</th>
+            <th class="text-center">Categoría</th>
+            <th class="text-center">Cantidad</th>
+            <th class="text-center">Vendedor</th>
+            <th class="text-center">Acciones</th>
+
         </tr>
         </thead>
 
@@ -54,20 +68,32 @@
         <tr th:each="producto : ${productos}">
             <td th:text="${producto.nombre}"></td>
             <td th:text="${producto.descripcion}"></td>
-            <td>$<span th:text="${producto.precio}"></span></td>
+            
+            <!-- Contenido de Precio centrado -->
+            <td class="text-price text-center">
+                $<span th:text="${#numbers.formatDecimal(producto.precio, 1, 'POINT', 2, 'COMMA')}"></span>
+            </td>
+            
             <td th:text="${producto.categoria.nombre}"></td>
-            <td th:text="${producto.cantidad}"></td>
+            
+            <!-- Contenido de Cantidad centrado y compactado -->
+            <td class="text-numeric" th:text="${producto.cantidad}"></td>
+            
+            <td th:text="${producto.usuario != null} ? ${producto.usuario.nombre} : 'Administrador'"></td>
 
-            <td>
-                <form th:action="@{/carrito/agregar}" method="post" class="d-flex gap-2">
+
+            <td class="text-center"> <!-- Acciones centradas -->
+                <form th:action="@{/carrito/agregar}" method="post" class="d-flex gap-2 justify-content-center">
                     <input type="hidden" name="idUsuario" th:value="${usuario.idUsuario}" />
                     <input type="hidden" name="idProducto" th:value="${producto.idProducto}" />
 
-                    <input class="form-control form-control-sm" 
-                           type="number" name="cantidad" value="1" min="1" max="10"
+                    <input class="form-control form-control-sm"
+                           type="number" name="cantidad" value="1" min="1" 
+                           th:max="${producto.cantidad > 10 ? 10 : producto.cantidad}"
                            style="width: 70px;" />
 
-                    <button type="submit" class="btn btn-success btn-sm">
+                    <button type="submit" class="btn btn-success btn-sm"
+                            th:disabled="${producto.cantidad == 0}">
                         ➕ Agregar
                     </button>
                 </form>
@@ -76,8 +102,7 @@
         </tbody>
     </table>
 
-    <!-- Botón para ver el carrito -->
-    <a class="btn btn-primary mt-3" 
+    <a class="btn btn-primary mt-3"
        th:href="@{/carrito/usuario/{idUsuario}(idUsuario=${usuario.idUsuario})}">
         🛒 Ver Carrito
     </a>

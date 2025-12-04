@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,13 +20,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CompradorController {
 
-    private final ProductoService productoService; // inyectamos el servicio
-    private final UsuarioRepository usuarioRepo; // inyectamos el repositorio
+    private final ProductoService productoService;
+    private final UsuarioRepository usuarioRepo;
 
     @GetMapping("/home/{idUsuario}")
     public String home(@PathVariable("idUsuario") Integer idUsuario, Model model) {
         Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
         model.addAttribute("usuario", usuario);
+
+        // 🔥 ACTIVAR BUSCADOR
+        model.addAttribute("mostrarBuscador", true);
+
         return "comprador/home";
     }
 
@@ -34,21 +39,37 @@ public class CompradorController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         Usuario usuario = usuarioRepo.findByEmail(email).orElse(null);
+
         model.addAttribute("usuario", usuario);
-        return "comprador/home"; // debe existir home.html
+
+        // 🔥 ACTIVAR BUSCADOR
+        model.addAttribute("mostrarBuscador", true);
+
+        return "comprador/home";
     }
 
     @GetMapping("/productos")
-    public String productos(Model model) {
-        // Obtener el usuario actual
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName(); // email del usuario logueado
+public String productos(
+        @RequestParam(required = false) String nombre,
+        @RequestParam(required = false) Double precioMin,
+        @RequestParam(required = false) Double precioMax,
+        Model model) {
 
-        // Buscar el Usuario en la base de datos
-        Usuario usuario = usuarioRepo.findByEmail(email).orElse(null);
+    // Obtener el usuario actual
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String email = auth.getName();
+    Usuario usuario = usuarioRepo.findByEmail(email).orElse(null);
 
-        model.addAttribute("productos", productoService.listar());
-        model.addAttribute("usuario", usuario); // ahora Thymeleaf puede usar usuario.idUsuario
-        return "comprador/productos";
-    }
+    // 🔥 FILTRAR PRODUCTOS SEGÚN PARÁMETROS
+    model.addAttribute("productos", productoService.buscarPorFiltros(
+            nombre != null ? nombre : "",
+            precioMin != null ? precioMin : 0.0,
+            precioMax != null ? precioMax : Double.MAX_VALUE
+    ));
+
+    model.addAttribute("usuario", usuario);
+    model.addAttribute("mostrarBuscador", true);
+
+    return "comprador/productos";
+}
 }

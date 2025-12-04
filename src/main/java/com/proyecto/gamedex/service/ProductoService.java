@@ -3,6 +3,7 @@ package com.proyecto.gamedex.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.proyecto.gamedex.model.Producto;
+import com.proyecto.gamedex.model.Usuario;
 import com.proyecto.gamedex.repository.ProductoRepository;
 
 import java.util.List;
@@ -35,12 +36,26 @@ public class ProductoService {
         existente.setCantidad(p.getCantidad());
         existente.setDiasGarantia(p.getDiasGarantia());
         existente.setCategoria(p.getCategoria());
-        existente.setUsuario(p.getUsuario());
+        existente.setUsuario(p.getUsuario()); // ⚠️ importante, asignar usuario correcto
 
         return productoRepository.save(existente);
     }
 
     public void eliminar(Integer id) {
         productoRepository.deleteById(id);
+    }
+
+    // 🔥 Método actual para filtros generales
+    public List<Producto> buscarPorFiltros(String nombre, Double min, Double max) {
+        return productoRepository.buscarPorFiltros(nombre, min, max);
+    }
+
+    // 🔥 Nuevo método: buscar productos de un vendedor específico con filtros
+    public List<Producto> buscarPorVendedor(Usuario usuario, String nombre, Double min, Double max) {
+        return productoRepository.findByUsuarioAndNombreContainingIgnoreCaseAndPrecioBetween(
+                usuario,
+                nombre != null ? nombre : "",
+                min != null ? min : 0.0,
+                max != null ? max : Double.MAX_VALUE);
     }
 }

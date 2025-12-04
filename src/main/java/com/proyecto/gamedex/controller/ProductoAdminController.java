@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 
 import com.proyecto.gamedex.model.Producto;
@@ -17,22 +18,47 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequestMapping("/admin/productos")
 @RequiredArgsConstructor
-
 public class ProductoAdminController {
 
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
 
+    // ⬅️ MODIFICADO: ahora también maneja búsqueda
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("productos", productoService.listar());
-        return "admin/productos"; // vista dentro de templates/admin/
+    public String listar(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Double precioMin,
+            @RequestParam(required = false) Double precioMax,
+            Model model
+    ) {
+
+        // Si NO hay búsqueda → listar normal
+        if ((nombre == null || nombre.isEmpty()) && precioMin == null && precioMax == null) {
+            model.addAttribute("productos", productoService.listar());
+        } else {
+            // Si hay filtros → buscar
+            model.addAttribute("productos",
+                    productoService.buscarPorFiltros(nombre, precioMin, precioMax));
+        }
+
+        // Mantener valores en inputs
+        model.addAttribute("nombreBusqueda", nombre);
+        model.addAttribute("precioMinBusqueda", precioMin);
+        model.addAttribute("precioMaxBusqueda", precioMax);
+
+        // Mostrar botón "limpiar"
+        boolean hayBusqueda = (nombre != null && !nombre.isEmpty())
+                || precioMin != null
+                || precioMax != null;
+        model.addAttribute("hayBusqueda", hayBusqueda);
+
+        return "admin/productos";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("producto", new Producto());
-        model.addAttribute("categorias", categoriaService.listar()); // <--
+        model.addAttribute("categorias", categoriaService.listar());
         return "admin/productos_form";
     }
 

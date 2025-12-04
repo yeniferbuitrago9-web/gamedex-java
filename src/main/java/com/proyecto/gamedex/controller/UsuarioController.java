@@ -1,9 +1,14 @@
 package com.proyecto.gamedex.controller;
 
 import java.util.Optional;
+import java.util.List;
+
 import com.proyecto.gamedex.model.Usuario;
 import com.proyecto.gamedex.repository.RolRepository;
 import com.proyecto.gamedex.repository.UsuarioRepository;
+import com.proyecto.gamedex.service.ReporteService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +28,9 @@ public class UsuarioController {
     @Autowired
     private RolRepository rolRepo;
 
+    @Autowired
+    private ReporteService reporteService;
+
     // ------------------- CREAR USUARIO -------------------
     @GetMapping("/nuevo")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
@@ -34,7 +42,11 @@ public class UsuarioController {
 
     // ------------------- GUARDAR USUARIO -------------------
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Usuario usuario, Model model) {
+    public String guardar(
+            @ModelAttribute Usuario usuario,
+            @RequestParam("idRol") Integer idRol,
+            Model model) {
+
         boolean esEdicion = usuario.getIdUsuario() != null;
 
         // Validar email duplicado
@@ -51,8 +63,11 @@ public class UsuarioController {
             }
         }
 
+        // 👉 ASIGNAR EL ROL SELECCIONADO
+        usuario.getRoles().clear();
+        usuario.getRoles().add(rolRepo.findById(idRol).orElseThrow());
+
         if (esEdicion) {
-            // Editar usuario existente
             Usuario u = repo.findById(usuario.getIdUsuario())
                     .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
@@ -67,8 +82,8 @@ public class UsuarioController {
             }
 
             repo.save(u);
+
         } else {
-            // Crear nuevo usuario
             usuario.setPassword(new BCryptPasswordEncoder().encode(usuario.getPassword()));
             repo.save(usuario);
         }
@@ -78,9 +93,9 @@ public class UsuarioController {
 
     // ------------------- LISTAR -------------------
     @GetMapping("/lista")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public String listar(Model model) {
         model.addAttribute("usuarios", repo.findAll());
+        model.addAttribute("roles", rolRepo.findAll());
         return "admin/usuarios";
     }
 
@@ -169,4 +184,47 @@ public class UsuarioController {
                 return "redirect:/auth/login?error";
         }
     }
+
+    // ------------------- BUSCAR -------------------
+    @GetMapping("/buscar")
+    public String buscar(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String docUsuario,
+            @RequestParam(required = false) Integer rolId,
+            Model model) {
+
+        List<Usuario> resultados = repo.buscarUsuarios(nombre, email, docUsuario, rolId);
+
+        model.addAttribute("usuarios", resultados);
+        model.addAttribute("roles", rolRepo.findAll());
+
+        return "admin/usuarios";
+    }
+
+    // =====================================================
+    // 🟦 EXPORTAR A PDF
+    // =====================================================
+    @GetMapping("/export/pdf")
+    public void exportarPdf(HttpServletResponse response) throws Exception {
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=usuarios.pdf");
+
+        reporteService.exportarUsuariosPdf(repo.findAll(), response.getOutputStream());
+    }
+
+    // =====================================================
+    // 🟩 EXPORTAR A EXCEL
+    // =====================================================
+    @GetMapping("/export/excel")
+    public void exportarExcel(HttpServletResponse response) throws Exception {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=usuarios.xlsx");
+
+        var workbook = reporteService.exportarUsuariosExcel(repo.findAll());
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
+    
+
 }
