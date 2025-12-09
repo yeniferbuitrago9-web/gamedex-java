@@ -65,7 +65,10 @@
                     <label class="form-label">Cantidad</label>
                     <input type="number" th:field="*{cantidad}" class="form-control" min="0" required>
                 </div>
-
+                <div class="mb-3">
+    <label class="form-label">Días de Garantía</label>
+    <input type="number" th:field="*{diasGarantia}" class="form-control" min="0" required>
+</div>
                 <!-- Botones -->
                 <div class="d-flex justify-content-between">
                     <a th:href="@{/vendedor/productos}" class="btn btn-secondary">Cancelar</a>

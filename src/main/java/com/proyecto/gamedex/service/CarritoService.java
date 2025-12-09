@@ -15,7 +15,7 @@ public class CarritoService {
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    // Crear un carrito o devolver el existente
+    // Crear carrito
     public Carrito crearCarrito(Integer idUsuario) {
 
         Usuario usuario = usuarioRepository.findById(idUsuario)
@@ -30,7 +30,7 @@ public class CarritoService {
                 });
     }
 
-    // Agregar items al carrito
+    // 👉 Agregar item al carrito (CORRECTO: suma si existe)
     public Carrito agregarItem(Integer idCarrito, Integer idProducto, Integer cantidad) {
 
         Carrito carrito = carritoRepository.findById(idCarrito)
@@ -39,13 +39,29 @@ public class CarritoService {
         Producto producto = productoRepository.findById(idProducto)
                 .orElseThrow(() -> new RuntimeException("Producto no existe"));
 
-        CarritoItem item = new CarritoItem();
-        item.setCarrito(carrito);
-        item.setProducto(producto);
-        item.setCantidad(cantidad);
+        // 🔹 VERIFICAR SI EL PRODUCTO ESTÁ ACTIVO
+        if (producto.getActivo() != null && !producto.getActivo()) {
+            throw new RuntimeException("No se puede agregar un producto desactivado al carrito");
+        }
 
-        itemRepository.save(item);
+        // 1️⃣ Verificar si ya existe el item
+        CarritoItem itemExistente = itemRepository
+                .findByCarrito_IdCarritoAndProducto_IdProducto(idCarrito, idProducto);
 
+        if (itemExistente != null) {
+            // 2️⃣ Si ya está en el carrito, aumentar cantidad
+            itemExistente.setCantidad(itemExistente.getCantidad() + cantidad);
+            itemRepository.save(itemExistente);
+        } else {
+            // 3️⃣ Si no existe, crearlo
+            CarritoItem nuevo = new CarritoItem();
+            nuevo.setCarrito(carrito);
+            nuevo.setProducto(producto);
+            nuevo.setCantidad(cantidad);
+            itemRepository.save(nuevo);
+        }
+
+        // Actualizar cantidad total del carrito
         carrito.setCantidad(carrito.getCantidad() + cantidad);
         return carritoRepository.save(carrito);
     }
@@ -64,27 +80,17 @@ public class CarritoService {
         itemRepository.deleteById(idItem);
     }
 
-    // Obtener carrito por usuario
+    // Obtener carrito
     public Carrito obtenerPorUsuario(Integer idUsuario) {
         return carritoRepository.findByUsuario_IdUsuario(idUsuario)
                 .orElse(null);
     }
 
-    // Agregar item usando idUsuario (auto crea carrito)
+    // Agregar item desde idUsuario (auto crea carrito)
     public void agregarItemPorUsuario(Integer idUsuario, Integer idProducto, Integer cantidad) {
         Carrito carrito = crearCarrito(idUsuario);
 
-        Producto producto = productoRepository.findById(idProducto)
-                .orElseThrow(() -> new RuntimeException("Producto no existe"));
-
-        CarritoItem item = new CarritoItem();
-        item.setCarrito(carrito);
-        item.setProducto(producto);
-        item.setCantidad(cantidad);
-
-        itemRepository.save(item);
-
-        carrito.setCantidad(carrito.getCantidad() + cantidad);
-        carritoRepository.save(carrito);
+        // Reutilizar la misma lógica
+        agregarItem(carrito.getIdCarrito(), idProducto, cantidad);
     }
 }

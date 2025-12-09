@@ -11,21 +11,31 @@
     <style>
         body {
             background: #f5f7fa;
+            font-family: 'Inter', sans-serif; /* Usando Inter para mejor legibilidad */
         }
         .table thead {
             background: #e8eef3;
+            /* 1. Estilo para centrar el texto del encabezado */
+            text-align: center; 
+        }
+        .table thead th {
+            /* Fuente un poco más gruesa */
+            font-weight: 700;
         }
         .btn-primary {
             background-color: #4c84ff;
             border: none;
+            border-radius: 8px; /* Ligeramente más redondeado */
         }
         .btn-warning {
             color: #000;
         }
         .btn-accion {
-            padding: 4px 8px;
+            padding: 4px 10px; /* Más espacio horizontal */
             border-radius: 6px;
             font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
         }
         .btn-edit {
             background: #ffc107;
@@ -43,35 +53,70 @@
         }
         .card {
             border-radius: 12px;
+            border: none; /* Eliminar el borde predeterminado de Bootstrap */
+        }
+
+        /* Asegurar que el contenido de las celdas sea legible */
+        .table td {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* Añadir padding vertical para un look más limpio */
+            padding-top: 10px; 
+            padding-bottom: 10px;
         }
 
         /* 🚀 PARA QUE LAS ACCIONES NO SE BAJEN DE LÍNEA */
         .acciones-col {
             white-space: nowrap;
         }
+        /* Estilo para los botones secundarios */
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
 
-<div class="container mt-4">
+<div class="container mt-5">
+   <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+<div th:if="${info}" class="alert alert-info" th:text="${info}"></div>
+<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
     <!-- ENCABEZADO -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold">Gestión de Productos</h2>
-        <a class="btn btn-primary" th:href="@{/vendedor/productos/nuevo}">+ Nuevo Producto</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">Gestión de Productos</h2>
+        <a class="btn btn-primary shadow-sm" th:href="@{/vendedor/productos/nuevo}">+ Nuevo Producto</a>
     </div>
 
     <!-- TABLA -->
-    <div class="card shadow-sm p-3">
+    <div class="card shadow p-4">
         <div class="table-responsive">
             <table class="table table-hover align-middle">
+                
+                <!-- 3. Definición de Anchos de Columna para mejor visualización -->
+                <colgroup>
+                    <col style="width: 15%;"> <!-- Nombre -->
+                    <col style="width: 30%;"> <!-- Descripción (la más ancha) -->
+                    <col style="width: 10%;"> <!-- Precio -->
+                    <col style="width: 15%;"> <!-- Categoría -->
+                    <col style="width: 8%;">  <!-- Cantidad (la más estrecha) -->
+                    <col style="width: 22%;"> <!-- Acciones -->
+                </colgroup>
+
                 <thead>
                 <tr>
                     <th>Nombre</th>
                     <th>Descripción</th>
-                    <th>Precio</th>
+                    <th class="text-center">Precio</th>
                     <th>Categoría</th>
-                    <th>Cantidad</th>
+                    <th class="text-center">Cantidad</th>
                     <th class="text-center">Acciones</th>
                 </tr>
                 </thead>
@@ -81,39 +126,45 @@
                     <td th:text="${p.nombre}"></td>
                     <td th:text="${p.descripcion}"></td>
 
-                    <!-- PRECIO SIN DECIMALES -->
-                    <td>
+                    <!-- PRECIO ALINEADO A LA DERECHA (más natural para números) -->
+                    <td class="text-end">
                         $ <span th:text="${#numbers.formatDecimal(p.precio, 0, 'COMMA', 0, 'POINT')}"></span>
                     </td>
 
                     <td th:text="${p.categoria.nombre}"></td>
-                    <td th:text="${p.cantidad}"></td>
+                    
+                    <!-- 2. Contenido de Cantidad Centrado -->
+                    <td class="text-center" th:text="${p.cantidad}"></td>
 
-                    <!-- ✔ ACCIONES EN UNA SOLA LÍNEA -->
+                    <!-- ✔ ACCIONES EN UNA SOLA LÍNEA y Centrado -->
                     <td class="text-center acciones-col">
                         <a th:href="@{'/vendedor/productos/editar/' + ${p.idProducto}}"
                            class="btn btn-accion btn-edit">
                             ✏️ Editar
                         </a>
-
+                        <!-- Se recomienda usar un modal o función JS para la confirmación en lugar de un alert nativo, pero mantendré el código original por si el backend lo maneja -->
                         <a th:href="@{'/vendedor/productos/eliminar/' + ${p.idProducto}}"
                            class="btn btn-accion btn-delete"
-                           onclick="return confirm('¿Eliminar este producto?');">
+                           onclick="return confirm('¿Está seguro de que desea eliminar este producto permanentemente?');">
                             🗑️ Eliminar
                         </a>
                     </td>
                 </tr>
+        
                 </tbody>
             </table>
         </div>
     </div>
 
     <!-- BOTÓN REGRESAR AL HOME vendedor -->
-    <div class="mt-3">
-        <a class="btn btn-secondary" th:href="@{/vendedor/home}">🏠 Volver al Panel</a>
+    <div class="mt-4">
+        <a class="btn btn-secondary shadow-sm" th:href="@{/vendedor/home}">🏠 Volver al Panel</a>
     </div>
 
 </div>
+
+<!-- Script de Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 
 import com.proyecto.gamedex.model.Producto;
@@ -29,8 +30,7 @@ public class ProductoAdminController {
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) Double precioMin,
             @RequestParam(required = false) Double precioMax,
-            Model model
-    ) {
+            Model model) {
 
         // Si NO hay búsqueda → listar normal
         if ((nombre == null || nombre.isEmpty()) && precioMin == null && precioMax == null) {
@@ -83,8 +83,18 @@ public class ProductoAdminController {
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id) {
-        productoService.eliminar(id);
+    public String eliminar(@PathVariable Integer id, RedirectAttributes redirectAttrs) {
+
+        boolean eliminado = productoService.eliminar(id);
+
+        if (!eliminado) {
+            redirectAttrs.addFlashAttribute("error",
+                    "No se puede eliminar el producto porque está dentro de un carrito.");
+        } else {
+            redirectAttrs.addFlashAttribute("success", "Producto eliminado exitosamente.");
+        }
+
         return "redirect:/admin/productos";
     }
+
 }

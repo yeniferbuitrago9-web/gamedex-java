@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 import org.springframework.security.core.Authentication;
 import com.proyecto.gamedex.model.Producto;
@@ -14,6 +15,7 @@ import com.proyecto.gamedex.model.Usuario;
 import com.proyecto.gamedex.repository.UsuarioRepository;
 import com.proyecto.gamedex.service.CategoriaService;
 import com.proyecto.gamedex.service.ProductoService;
+import com.proyecto.gamedex.service.ResultadoEliminacion;
 
 import lombok.RequiredArgsConstructor;
 
@@ -64,8 +66,29 @@ public class VendedorProductoController {
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id) {
-        productoService.eliminar(id);
+    public String eliminar(@PathVariable Integer id, RedirectAttributes redirectAttrs) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        Usuario vendedor = usuarioRepo.findByEmail(email).orElse(null);
+
+        ResultadoEliminacion resultado = productoService.eliminarODesactivarPorVendedor(id, vendedor);
+
+        switch (resultado) {
+            case EXITO:
+                redirectAttrs.addFlashAttribute("success", "Producto eliminado exitosamente.");
+                break;
+            case DESACTIVADO:
+                redirectAttrs.addFlashAttribute("info",
+                        "El producto no se puede eliminar porque está en un carrito. Se ha desactivado.");
+                break;
+            case NO_EXISTE_O_NO_ES_TUYO:
+                redirectAttrs.addFlashAttribute("error",
+                        "No se puede eliminar el producto porque no es tuyo o no existe.");
+                break;
+        }
+
         return "redirect:/vendedor/productos";
     }
+
 }

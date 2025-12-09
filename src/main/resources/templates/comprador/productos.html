@@ -93,9 +93,9 @@
                            style="width: 70px;" />
 
                     <button type="submit" class="btn btn-success btn-sm"
-                            th:disabled="${producto.cantidad == 0}">
-                        ➕ Agregar
-                    </button>
+        th:disabled="${producto.cantidad == 0 or (producto.activo != null and !producto.activo)}">
+    <span th:text="${producto.activo != null and !producto.activo} ? '❌ Desactivado' : '➕ Agregar'"></span>
+</button>
                 </form>
             </td>
         </tr>
